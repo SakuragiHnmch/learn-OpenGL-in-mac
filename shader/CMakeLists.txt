@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(HelloTriangle)
+project(hello_opengl)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -18,6 +18,7 @@ set(GLAD_HOME $ENV{GLAD_HOME})
 # 设置头文件目录
 include_directories("${GLFW_HOME}/include")
 include_directories("${GLAD_HOME}/include")
+include_directories(include)
 
 # 添加 GLFW3 预编译库
 add_library(glfw SHARED IMPORTED)
@@ -26,8 +27,9 @@ SET_TARGET_PROPERTIES(glfw PROPERTIES IMPORTED_LOCATION "${GLFW_HOME}/lib-macos/
 # 编译 GLAD 库
 add_library(glad SHARED "${GLAD_HOME}/src/glad.c")
 
+
 # 创建可执行文件
-add_executable(HelloTriangle main.cpp)
+add_executable(hello_opengl src/main.cpp)
 
 # 链接 GLFW GLAD OpenGL
-target_link_libraries(HelloTriangle glfw glad "-framework OpenGL")
+target_link_libraries(hello_opengl glfw glad "-framework OpenGL")
