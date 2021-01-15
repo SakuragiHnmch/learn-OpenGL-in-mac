@@ -112,6 +112,18 @@ int main()
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -199,26 +211,29 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-        glm::mat4 model;
-        model = glm::rotate(model,  (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        glm::mat4 view;
-        view = glm::translate(view, glm::vec3(.0f, .0f, -3.0f));
-
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         // render the triangle
         ourShader.use();
 
-        unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glm::mat4 view;
+        view = glm::translate(view, glm::vec3(.0f, .0f, -3.0f));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         unsigned int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
         glBindVertexArray(VAO);
 //        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(unsigned i = 1; i < 10; i++){
+            glm::mat4 model;
+            model = glm::translate(model, cubePositions[i]);
+            float angles = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angles), glm::vec3(1.0f, .3f, .5f));
+            ourShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
