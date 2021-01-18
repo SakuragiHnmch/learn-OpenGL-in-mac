@@ -60,13 +60,13 @@ public:
 
         // 顶点着色器
         vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
+        glShaderSource(vertex, 1, &vShaderCode, nullptr);
         glCompileShader(vertex);
         // 打印编译错误（如果有的话）
         glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
         if(!success)
         {
-            glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+            glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
             std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
         };
 
@@ -89,7 +89,7 @@ public:
         glGetProgramiv(ID, GL_LINK_STATUS, &success);
         if(!success)
         {
-            glGetProgramInfoLog(ID, 512, NULL, infoLog);
+            glGetProgramInfoLog(ID, 512, nullptr, infoLog);
             std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
         }
 
