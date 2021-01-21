@@ -147,14 +147,9 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-//        glm::mat4 trans;
-//        trans = glm::scale(trans, glm::vec3(.5f, .5f, .5f));
-//        trans = glm::translate(trans, glm::vec3(0.3f, -0.2f, 0.0f));
-//        trans = glm::rotate(trans, glm::radians((float) glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f) );
         glm::mat4 transform = glm::mat4(1.0f);
-//        transform = glm::scale(transform, glm::vec3(.2f, .2f, .2f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
         transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
         ourShader.setFloat("mixValue", mixValue);
         ourShader.use();
@@ -163,8 +158,17 @@ int main()
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        //second transformation
+        transform = glm::mat4 (1.0f);
+        float scaleAmount = sin(glfwGetTime());
+        transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
+        transform = glm::scale(transform, glm::vec3(scaleAmount, scaleAmount,scaleAmount));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+//        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform[0][0]);
+
+        //now with the uniformMatrix has been replaced by the new transformation, draw if again
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
