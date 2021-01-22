@@ -19,7 +19,7 @@ enum Camera_Movement {
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 0.25f;
-const float SENSITIVE = 0.0001f;
+const float SENSITIVITY = 0.03f;
 const float ZOOM = 45.0f;
 
 class Camera{
@@ -35,11 +35,11 @@ public:
     float Pitch;
     //camera options
     float MovementSpeed;
-    float MouseSensitive;
+    float MouseSensitivity;
     float Zoom;
 
     //constructor with vectors
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f ,0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitive(SENSITIVE), Zoom(ZOOM){
+    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f ,0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM){
         Position = position;
         WorldUp = up;
         Yaw = yaw;
@@ -53,7 +53,7 @@ public:
         WorldUp = glm::vec3(upX, upY, upZ);
         Yaw = yaw;
         Pitch = pitch;
-        updateCameraVectors();
+        updateCameraVector();
     }
 
     //returns the view matrix calculated using Euler angles and the LookAt Matrix
@@ -69,13 +69,13 @@ public:
             Position -= velocity * Front;
         if(direction == LEFT)
             Position -= velocity * Right;
-        if(direction == Right)
+        if(direction == RIGHT)
             Position += velocity * Right;
     }
 
     void ProcessMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true){
-        offsetX *= MouseSensitive;
-        offsetY *= MouseSensitive;
+        offsetX *= MouseSensitivity;
+        offsetY *= MouseSensitivity;
 
         Yaw += offsetX;
         Pitch += offsetY;
