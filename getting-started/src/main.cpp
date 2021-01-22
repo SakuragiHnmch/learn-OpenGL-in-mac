@@ -60,7 +60,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -307,6 +307,10 @@ void mouse_callback(GLFWwindow* window, double posX, double posY){
     }
     float offsetX = posX - lastX;
     float offsetY = lastY - posY;//y坐标是自底往上增大的，而俯仰角应该随着鼠标自底往上减小
+
+    //don`t forget update the last position!!!!!
+    lastX = posX;
+    lastY = posY;
 
     float sensitivity = 0.0001f;
     offsetX *= sensitivity;
