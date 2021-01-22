@@ -18,7 +18,9 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 //camera
-
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 //store how much we are seeing of each texture
 float mixValue = 0.2f;
@@ -200,15 +202,8 @@ int main()
 
 //        glm::mat4 model;
 //        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        float radius = 10.0f;
-        float camX = sin(glfwGetTime()) * radius;
-        float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::lookAt(
-                glm::vec3(camX, 0.0f, camZ),
-                glm::vec3(0.0f,0.0f,0.0f),
-                glm::vec3(0.0f,1.0f, 0.0f)
-                );
+        view = glm::lookAt(cameraPos, cameraFront + cameraPos, cameraUp);
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setFloat("mixValue", mixValue);
@@ -262,6 +257,18 @@ void processInput(GLFWwindow *window)
             mixValue = 0.0f;
         }
     }
+
+    //the change in cameraPos wound be applied reversely in the objects
+    float cameraSpeed = 0.05f;
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
