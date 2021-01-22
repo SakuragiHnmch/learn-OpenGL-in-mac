@@ -22,6 +22,10 @@ glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
+//time
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
+
 //store how much we are seeing of each texture
 float mixValue = 0.2f;
 
@@ -241,6 +245,11 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
+    float  currentTime = glfwGetTime();
+    deltaTime = currentTime - lastTime;
+    currentTime = currentTime;
+    float cameraSpeed = deltaTime * 0.05f;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -259,7 +268,6 @@ void processInput(GLFWwindow *window)
     }
 
     //the change in cameraPos wound be applied reversely in the objects
-    float cameraSpeed = 0.05f;
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
