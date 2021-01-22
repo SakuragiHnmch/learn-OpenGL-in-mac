@@ -17,6 +17,9 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+//camera
+
+
 //store how much we are seeing of each texture
 float mixValue = 0.2f;
 
@@ -197,8 +200,15 @@ int main()
 
 //        glm::mat4 model;
 //        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(.0f, .0f, -3.0f));
+        view = glm::lookAt(
+                glm::vec3(camX, 0.0f, camZ),
+                glm::vec3(0.0f,0.0f,0.0f),
+                glm::vec3(0.0f,1.0f, 0.0f)
+                );
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         ourShader.setFloat("mixValue", mixValue);
