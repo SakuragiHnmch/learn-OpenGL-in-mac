@@ -179,10 +179,8 @@ int main()
 
         //draw the cube object
         objectShader.use();
-        objectShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        objectShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
-        lightPos.x = 1.2f + sin(glfwGetTime()) * 2.0f;
-        lightPos.y =1.0f + cos(glfwGetTime()) * 2.0f;
+        lightPos.x = 1.2f + sin(glfwGetTime()) * 1.0f;
+        lightPos.y =1.0f + cos(glfwGetTime()) * 0.5f;
         objectShader.setVec3("lightPos", lightPos);
         objectShader.setVec3("viewPos", camera.Position);
 
@@ -190,9 +188,23 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         objectShader.setMat4("projection", projection);
         objectShader.setMat4("view", view);
-
         glm::mat4 model = glm::mat4(1.0f);
         objectShader.setMat4("model", model);
+
+        objectShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
+        objectShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
+        objectShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        objectShader.setFloat("material.shininess", 32.0f);
+
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 3.9f);
+        lightColor.y = sin(glfwGetTime() * 0.4f);
+        lightColor.z = sin(glfwGetTime() * 1.2f);
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.4f);
+        glm::vec3 ambientColor = lightColor * glm::vec3(0.1f);
+        objectShader.setVec3("light.ambient",  ambientColor);
+        objectShader.setVec3("light.diffuse",  diffuseColor);
+        objectShader.setVec3("light.specular", lightColor);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
