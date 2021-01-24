@@ -21,7 +21,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 //camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 3.0f));
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
 //time
@@ -181,6 +181,8 @@ int main()
         objectShader.use();
         objectShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
         objectShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+        lightPos.x = 1.2f + sin(glfwGetTime()) * 2.0f;
+        lightPos.y =1.0f + cos(glfwGetTime()) * 2.0f;
         objectShader.setVec3("lightPos", lightPos);
         objectShader.setVec3("viewPos", camera.Position);
 
