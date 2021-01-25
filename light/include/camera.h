@@ -12,14 +12,16 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 //Default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 0.05f;
-const float SENSITIVITY = 0.01f;
+const float SPEED = 0.005f;
+const float SENSITIVITY = 0.001f;
 const float ZOOM = 45.0f;
 
 class Camera{
@@ -71,6 +73,10 @@ public:
             Position -= velocity * Right;
         if(direction == RIGHT)
             Position += velocity * Right;
+        if(direction == UP)
+            Position += velocity * Up;
+        if(direction == DOWN)
+            Position -= velocity * Up;
     }
 
     void ProcessMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true){
