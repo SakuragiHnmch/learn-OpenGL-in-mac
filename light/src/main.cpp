@@ -204,15 +204,19 @@ int main()
 //        objectShader.setMat4("model", model);
 
         objectShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        objectShader.setFloat("material.shininess", 128.0f);
+        objectShader.setFloat("material.shininess", 32.0f);
 
         objectShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
         objectShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
         objectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        objectShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
-        objectShader.setFloat("light.constant", 1.0f);
-        objectShader.setFloat("light.linear", 0.09f);
-        objectShader.setFloat("light.quadratic", 0.032f);
+//        objectShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+//        objectShader.setFloat("light.constant", 1.0f);
+//        objectShader.setFloat("light.linear", 0.09f);
+//        objectShader.setFloat("light.quadratic", 0.032f);
+        objectShader.setVec3("light.position", camera.Position);
+        objectShader.setVec3("light.direction", camera.Front);
+        objectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        objectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 
         //bind Maps
         glActiveTexture(GL_TEXTURE0);
