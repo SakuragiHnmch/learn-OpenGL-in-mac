@@ -22,7 +22,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 //camera
-Camera camera(glm::vec3(0.0f, 2.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2, lastY = SCR_HEIGHT / 2;
 bool firstMouse = true;
 //time
@@ -30,7 +30,7 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 
 //light
-glm::vec3 lightPos (1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos (0.5f, 0.2f, 2.0f);
 
 
 int main()
@@ -56,7 +56,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -164,9 +164,13 @@ int main()
 
     //load texture, we now use a utility function to keep the code more organized
     unsigned int diffuseMap = loadTexture("../image/container2.png");
+    unsigned int specularMap = loadTexture(("../image/container2_specular.png"));
+    unsigned int emissionMap = loadTexture("../image/matrix.jpg");
 
     objectShader.use();
     objectShader.setInt("material.diffuse", 0);
+    objectShader.setInt("material.specular", 1);
+    objectShader.setInt("material.emission", 2);
 
     // render loop
     // -----------
@@ -186,8 +190,8 @@ int main()
 
         //draw the cube object
         objectShader.use();
-        lightPos.x = 1.2f + sin(glfwGetTime()) * 1.0f;
-        lightPos.y =1.0f + cos(glfwGetTime()) * 0.5f;
+//        lightPos.x = 1.2f + sin(glfwGetTime()) * 1.0f;
+//        lightPos.y =1.0f + cos(glfwGetTime()) * 0.5f;
         objectShader.setVec3("lightPos", lightPos);
         objectShader.setVec3("viewPos", camera.Position);
 
@@ -196,26 +200,23 @@ int main()
         objectShader.setMat4("projection", projection);
         objectShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.2f, 1.0f, 0.3f));
         objectShader.setMat4("model", model);
 
-        objectShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
-        objectShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
         objectShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        objectShader.setFloat("material.shininess", 32.0f);
+        objectShader.setFloat("material.shininess", 128.0f);
 
-        glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 3.9f);
-        lightColor.y = sin(glfwGetTime() * 0.4f);
-        lightColor.z = sin(glfwGetTime() * 1.2f);
-        glm::vec3 diffuseColor = lightColor * glm::vec3(0.4f);
-        glm::vec3 ambientColor = lightColor * glm::vec3(0.1f);
-        objectShader.setVec3("light.ambient",  ambientColor);
-        objectShader.setVec3("light.diffuse",  diffuseColor);
-        objectShader.setVec3("light.specular", lightColor);
+        objectShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+        objectShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
+        objectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-        //bind diffuseMap
+        //bind Maps
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMap);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
