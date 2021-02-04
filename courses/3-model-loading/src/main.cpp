@@ -7,8 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+//#include <stb_image.h>
 #include <camera.h>
+#include <model.h>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -73,6 +74,9 @@ int main()
     // ------------------------------------
     Shader objectShader("shader/objectVertex.glsl", "shader/objectFrag.glsl");
     Shader lampShader("shader/lampVertex.glsl", "shader/lampFrag.glsl");
+    Shader modelShader("shader/modelVertex.glsl", "shader/modelFragment.glsl");
+
+    Model ourModel("model/nanosuit/nanosuit.obj");
 
     float vertices[] = {
             // positions          // normals           // texture coords
@@ -283,6 +287,13 @@ int main()
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        // render the loaded model
+        model = glm::mat4 (1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        modelShader.setMat4("model", model);
+        ourModel.Draw(modelShader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
