@@ -9,6 +9,8 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void increaseTransparency(float offset);
+void decreaseTransparency(float offset);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -130,17 +132,17 @@ int main() {
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
-    data = stbi_load("image/luffy.jpeg", &width, &height, &nrChannels, 0);
+    data = stbi_load("image/awesomeface.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         // note that the picture has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -157,9 +159,25 @@ int main() {
     // or set it via the texture class
     shader.setInt("texture2", 1);
 
+    float transparent = 0.2;
+    shader.setFloat("transparent", transparent);
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
+
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+            if (transparent + 0.01 <= 1.0) {
+                transparent += 0.01;
+                shader.setFloat("transparent", transparent);
+            }
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+            if (transparent - 0.01 >= 0) {
+                transparent -= 0.01;
+                shader.setFloat("transparent", transparent);
+            }
+        }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -192,4 +210,8 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+}
+
+void increaseTransparency(float offset) {
+
 }
