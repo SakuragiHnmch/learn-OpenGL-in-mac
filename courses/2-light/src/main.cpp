@@ -29,7 +29,7 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 
 //light
-glm::vec3 lightPos (0.2f, 1.0f, 1.0f);
+glm::vec3 lightPos (0.2f, 1.0f, 2.0f);
 
 
 int main()
@@ -71,8 +71,8 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader objectShader("shader/objectVertex.glsl", "shader/objectFrag.glsl");
-    Shader lampShader("shader/lampVertex.glsl", "shader/lampFrag.glsl");
+    Shader objectShader("shader/obj.vs", "shader/obj.fs");
+    Shader lampShader("shader/lamp.vs", "shader/lamp.fs");
 
 float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -166,10 +166,18 @@ float vertices[] = {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         objectShader.use();
-        objectShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        objectShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        objectShader.setVec3("lightPos", lightPos);
+        objectShader.setVec3("light.position", lightPos);
         objectShader.setVec3("viewPos", camera.Position);
+        //光照
+        objectShader.setVec3("light.ambient",  1.0f, 1.0f, 1.0f);
+        objectShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+        objectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        //材质
+        objectShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
+        objectShader.setVec3("material.diffuse", 0.0f, 0.50980392f, 0.50980392f);
+        objectShader.setVec3("material.specular", 0.50196078f, 0.50196078f, 0.50196078f);
+        objectShader.setFloat("material.shininess", 32.0f);
+
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
