@@ -119,6 +119,19 @@ int main()
             -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
@@ -135,24 +148,21 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof (float), (void*)(6 * sizeof (float)));
     glEnableVertexAttribArray(2);
 
-    unsigned int lightVAO;
-    glGenVertexArrays(1, &lightVAO);
-    glBindVertexArray(lightVAO);
-    //we only need to bind the VBO to link it with glVertexAttribPointer, no need to fill it. The VBO data already contains all we need
-    //actually, the VBO is already bound, but we do it again for educational purpose
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof (float),  (void*) nullptr);
-    glEnableVertexAttribArray(0);
+//    unsigned int lightVAO;
+//    glGenVertexArrays(1, &lightVAO);
+//    glBindVertexArray(lightVAO);
+//    //we only need to bind the VBO to link it with glVertexAttribPointer, no need to fill it. The VBO data already contains all we need
+//    //actually, the VBO is already bound, but we do it again for educational purpose
+//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof (float),  (void*) nullptr);
+//    glEnableVertexAttribArray(0);
 
     unsigned int diffuseMap = loadTexture("image/container2.png");
     unsigned int specularMap = loadTexture("image/container2_specular.png");
-    unsigned int emissionMap = loadTexture("image/matrix.jpeg");
-
 
     objectShader.use();
     objectShader.setInt("material.diffuse", 0);
     objectShader.setInt("material.specular", 1);
-    objectShader.setInt("material.emission", 2);
 
     // render loop
     // -----------
@@ -171,24 +181,19 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         objectShader.use();
-        objectShader.setVec3("light.position", lightPos);
+        objectShader.setVec3("light.position", camera.Position);
+        objectShader.setVec3("light.direction", camera.Front);
         objectShader.setVec3("viewPos", camera.Position);
-        //光照
-        glm::vec3 lightColor = glm::vec3(1.0f);
-//        lightColor.x = sin(glfwGetTime() * 1.0f);
-//        lightColor.y = sin(glfwGetTime() * 1.0f);
-//        lightColor.z = sin(glfwGetTime() * 1.0f);
+        objectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        objectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(.5f);
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(.2f);
-
-        objectShader.setVec3("light.ambient",  ambientColor);
-        objectShader.setVec3("light.diffuse",  diffuseColor);
+        objectShader.setVec3("light.ambient",  .2f, .2f, .2f);
+        objectShader.setVec3("light.diffuse",  .5f, .5f, .5f);
         objectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        //材质
-        objectShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
-        objectShader.setVec3("material.diffuse", 0.0f, 0.50980392f, 0.50980392f);
-        objectShader.setVec3("material.specular", 0.50196078f, 0.50196078f, 0.50196078f);
+        objectShader.setFloat("light.constant", 1.0f);
+        objectShader.setFloat("light.linear", 0.09f);
+        objectShader.setFloat("light.quadratic", 0.032f);
+
         objectShader.setFloat("material.shininess", 32.0f);
 
 
@@ -204,31 +209,39 @@ int main()
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, emissionMap);
 
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            objectShader.setMat4("model", model);
 
-        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
-        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
-        lampShader.use();
-        lampShader.setMat4("projection", projection);
-        lampShader.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lampShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+//        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+//        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+//        lampShader.use();
+//        lampShader.setMat4("projection", projection);
+//        lampShader.setMat4("view", view);
+//        model = glm::mat4(1.0f);
+//        model = glm::translate(model, lightPos);
+//        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
+//        lampShader.setMat4("model", model);
+//
+//        glBindVertexArray(lightVAO);
+//        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightVAO);
+//    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
