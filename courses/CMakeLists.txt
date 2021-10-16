@@ -6,3 +6,6 @@ add_subdirectory(2-light)
 
 # Course 3 - model loading
 add_subdirectory(3-model-loading)
+
+#Course 4 -advanced opengl
+add_subdirectory(4-advanced-openGL)
