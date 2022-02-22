@@ -12,14 +12,16 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Default camera values
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
-const float SPEED       =  2.5f;
-const float SENSITIVITY =  0.1f;
+const float YAW         = -90.0f; // 初始化为-90°代表相机朝向负z轴方向（定义yaw为从正x轴开始逆时针旋转的角度）
+const float PITCH       =  0.0f;  // 朝上看为正，朝下看为负
+const float SPEED       = 0.003f;
+const float SENSITIVITY = 0.01f;
 const float ZOOM        =  45.0f;
 
 
@@ -78,6 +80,10 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
+        if(direction == UP)
+            Position += velocity * WorldUp;
+        if(direction == DOWN)
+            Position -= velocity * WorldUp;
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -113,7 +119,7 @@ public:
     }
 
 private:
-    // calculates the front vector from the Camera's (updated) Euler Angles
+    // calculates the front vector from the Camera's (updated) Euler Angles ---front为相机朝向，direction为相机尾部朝向
     void updateCameraVectors()
     {
         // calculate the new Front vector
