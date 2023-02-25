@@ -104,6 +104,12 @@ public:
             Zoom = 45.0f;
     }
 
+    void SetSpeed(float mouseSpeed, float moveSpeed)
+    {
+        MovementSpeed = moveSpeed;
+        MouseSensitivity = mouseSpeed;
+    }
+
 private:
     //calculate the front vector from the camera`s (updated) euler angles
     void updateCameraVector(){
