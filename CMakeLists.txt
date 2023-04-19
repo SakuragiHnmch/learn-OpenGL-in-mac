@@ -15,3 +15,5 @@ add_subdirectory(3rd)
 
 # courses
 add_subdirectory(courses)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/common/resource DESTINATION ${CMAKE_BINARY_DIR}/courses)
