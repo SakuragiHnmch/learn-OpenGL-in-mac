@@ -21,6 +21,10 @@
    NOCRYPT and NOUNCRYPT.
 */
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+    #define MICROSOFT_WINDOWS_WINBASE_H_DEFINE_INTERLOCKED_CPLUSPLUS_OVERLOADS 0
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -39,10 +43,10 @@
 
 #include "crypt.h"
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #   pragma warning(push)
 #   pragma warning(disable : 4244)
-#endif // _WIN32
+#endif // _MSC_VER
 
 /***************************************************************************/
 
@@ -160,8 +164,8 @@ int crypthead(const char *passwd, uint8_t *buf, int buf_size, uint32_t *pkeys,
     return n;
 }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #   pragma warning(pop)
-#endif // _WIN32
+#endif // _MSC_VER
 
 /***************************************************************************/

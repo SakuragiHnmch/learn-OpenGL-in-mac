@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2022, assimp team
 
 
 All rights reserved.
@@ -107,6 +107,7 @@ namespace Blender {
 struct Object;
 struct MTex;
 struct Image;
+struct Collection;
 
 #include <memory>
 
@@ -123,7 +124,7 @@ struct ID : ElemBase {
 // -------------------------------------------------------------------------------
 struct ListBase : ElemBase {
     std::shared_ptr<ElemBase> first;
-    std::shared_ptr<ElemBase> last;
+    std::weak_ptr<ElemBase> last;
 };
 
 // -------------------------------------------------------------------------------
@@ -145,6 +146,26 @@ struct Group : ElemBase {
     int layer;
 
     std::shared_ptr<GroupObject> gobject;
+};
+
+// -------------------------------------------------------------------------------
+struct CollectionObject : ElemBase {
+    //CollectionObject* prev;
+    std::shared_ptr<CollectionObject> next;
+    Object *ob;
+};
+
+// -------------------------------------------------------------------------------
+struct CollectionChild : ElemBase {
+    std::shared_ptr<CollectionChild> next, prev;
+    std::shared_ptr<Collection> collection;
+};
+
+// -------------------------------------------------------------------------------
+struct Collection : ElemBase {
+    ID id FAIL;
+    ListBase gobject; // CollectionObject
+    ListBase children; // CollectionChild
 };
 
 // -------------------------------------------------------------------------------
@@ -621,14 +642,21 @@ struct ModifierData : ElemBase {
     };
 
     std::shared_ptr<ElemBase> next WARN;
-    std::shared_ptr<ElemBase> prev WARN;
+    std::weak_ptr<ElemBase> prev WARN;
 
     int type, mode;
     char name[32];
 };
 
+
+// ------------------------------------------------------------------------------------------------
+struct SharedModifierData : ElemBase {
+    ModifierData modifier;
+};
+
+
 // -------------------------------------------------------------------------------
-struct SubsurfModifierData : ElemBase {
+struct SubsurfModifierData : SharedModifierData {
 
     enum Type {
 
@@ -641,7 +669,6 @@ struct SubsurfModifierData : ElemBase {
         FLAGS_SubsurfUV = 1 << 3
     };
 
-    ModifierData modifier FAIL;
     short subdivType WARN;
     short levels FAIL;
     short renderLevels;
@@ -649,7 +676,7 @@ struct SubsurfModifierData : ElemBase {
 };
 
 // -------------------------------------------------------------------------------
-struct MirrorModifierData : ElemBase {
+struct MirrorModifierData : SharedModifierData {
 
     enum Flags {
         Flags_CLIPPING = 1 << 0,
@@ -661,11 +688,9 @@ struct MirrorModifierData : ElemBase {
         Flags_VGROUP = 1 << 6
     };
 
-    ModifierData modifier FAIL;
-
     short axis, flag;
     float tolerance;
-    std::shared_ptr<Object> mirror_ob;
+    std::weak_ptr<Object> mirror_ob;
 };
 
 // -------------------------------------------------------------------------------
@@ -729,11 +754,12 @@ struct Scene : ElemBase {
     std::shared_ptr<Object> camera WARN;
     std::shared_ptr<World> world WARN;
     std::shared_ptr<Base> basact WARN;
+    std::shared_ptr<Collection> master_collection WARN;
 
     ListBase base;
 
     Scene() :
-            ElemBase(), camera(), world(), basact() {
+            ElemBase(), camera(), world(), basact(), master_collection() {
         // empty
     }
 };

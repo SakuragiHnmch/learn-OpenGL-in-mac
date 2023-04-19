@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2022, assimp team
 
 
 All rights reserved.
@@ -129,7 +129,7 @@ inline std::string MakeUniqueId(const std::unordered_set<std::string> &idSet, co
         // Select a number to append
         size_t idnum = 1;
         do {
-            result = idPrefix + '_' + to_string(idnum) + postfix;
+            result = idPrefix + '_' + ai_to_string(idnum) + postfix;
             ++idnum;
         } while (!IsUniqueId(idSet, result));
     }
@@ -154,8 +154,7 @@ ColladaExporter::ColladaExporter(const aiScene *pScene, IOSystem *pIOSystem, con
 
 // ------------------------------------------------------------------------------------------------
 // Destructor
-ColladaExporter::~ColladaExporter() {
-}
+ColladaExporter::~ColladaExporter() = default;
 
 // ------------------------------------------------------------------------------------------------
 // Starts writing the contents
@@ -1017,7 +1016,7 @@ void ColladaExporter::WriteGeometry(size_t pIndex) {
     // texture coords
     for (size_t a = 0; a < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++a) {
         if (mesh->HasTextureCoords(static_cast<unsigned int>(a))) {
-            WriteFloatArray(geometryId + "-tex" + to_string(a), mesh->mNumUVComponents[a] == 3 ? FloatType_TexCoord3 : FloatType_TexCoord2,
+            WriteFloatArray(geometryId + "-tex" + ai_to_string(a), mesh->mNumUVComponents[a] == 3 ? FloatType_TexCoord3 : FloatType_TexCoord2,
                     (ai_real *)mesh->mTextureCoords[a], mesh->mNumVertices);
         }
     }
@@ -1025,7 +1024,7 @@ void ColladaExporter::WriteGeometry(size_t pIndex) {
     // vertex colors
     for (size_t a = 0; a < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++a) {
         if (mesh->HasVertexColors(static_cast<unsigned int>(a)))
-            WriteFloatArray(geometryId + "-color" + to_string(a), FloatType_Color, (ai_real *)mesh->mColors[a], mesh->mNumVertices);
+            WriteFloatArray(geometryId + "-color" + ai_to_string(a), FloatType_Color, (ai_real *)mesh->mColors[a], mesh->mNumVertices);
     }
 
     // assemble vertex structure
@@ -1330,9 +1329,9 @@ void ColladaExporter::WriteAnimationLibrary(size_t pIndex) {
             std::vector<std::string> names;
             for (size_t i = 0; i < nodeAnim->mNumPositionKeys; ++i) {
                 if (nodeAnim->mPreState == aiAnimBehaviour_DEFAULT || nodeAnim->mPreState == aiAnimBehaviour_LINEAR || nodeAnim->mPreState == aiAnimBehaviour_REPEAT) {
-                    names.push_back("LINEAR");
+                    names.emplace_back("LINEAR");
                 } else if (nodeAnim->mPostState == aiAnimBehaviour_CONSTANT) {
-                    names.push_back("STEP");
+                    names.emplace_back("STEP");
                 }
             }
 
@@ -1724,7 +1723,7 @@ ColladaExporter::NameIdPair ColladaExporter::AddObjectIndexToMaps(AiObjectType t
         case AiObjectType::Camera: idStr = std::string("camera_"); break;
         case AiObjectType::Count: throw std::logic_error("ColladaExporter::AiObjectType::Count is not an object type");
         }
-        idStr.append(to_string(index));
+        idStr.append(ai_to_string(index));
     } else {
         idStr = XMLIDEncode(name);
     }

@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2022, assimp team
 
 All rights reserved.
 
@@ -83,8 +83,7 @@ Other:
 #include <sstream>
 #include <string>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "Common/StbCommon.h"
 
 using namespace Assimp;
 
@@ -106,14 +105,13 @@ void ExportScenePbrt (
 } // end of namespace Assimp
 
 // Constructor
-PbrtExporter::PbrtExporter (
-    const aiScene* pScene, IOSystem* pIOSystem,
-    const std::string path, const std::string file)
-: mScene(pScene),
-  mIOSystem(pIOSystem),
-  mPath(path),
-  mFile(file)
-{
+PbrtExporter::PbrtExporter(
+        const aiScene *pScene, IOSystem *pIOSystem,
+        const std::string &path, const std::string &file) :
+        mScene(pScene),
+        mIOSystem(pIOSystem),
+        mPath(path),
+        mFile(file) {
     // Export embedded textures.
     if (mScene->mNumTextures > 0)
         if (!mIOSystem->CreateDirectory("textures"))
@@ -164,9 +162,7 @@ PbrtExporter::PbrtExporter (
 }
 
 // Destructor
-PbrtExporter::~PbrtExporter() {
-    // Empty
-}
+PbrtExporter::~PbrtExporter() = default;
 
 void PbrtExporter::WriteMetaData() {
     mOutput << "#############################\n";
@@ -210,12 +206,12 @@ void PbrtExporter::WriteMetaData() {
                 aiString* value =
                     static_cast<aiString*>(pMetaData->mValues[i].mData);
                 std::string svalue = value->C_Str();
-                std::size_t found = svalue.find_first_of("\n");
+                std::size_t found = svalue.find_first_of('\n');
                 mOutput << "\n";
                 while (found != std::string::npos) {
                     mOutput << "#     " << svalue.substr(0, found) << "\n";
                     svalue = svalue.substr(found + 1);
-                    found = svalue.find_first_of("\n");
+                    found = svalue.find_first_of('\n');
                 }
                 mOutput << "#     " << svalue << "\n";
                 break;
@@ -592,12 +588,12 @@ void PbrtExporter::WriteMaterial(int m) {
     for (int i = 1; i <= aiTextureType_UNKNOWN; i++) {
         int count = material->GetTextureCount(aiTextureType(i));
         if (count > 0)
-            mOutput << TextureTypeToString(aiTextureType(i)) << ": " <<  count << " ";
+            mOutput << aiTextureTypeToString(aiTextureType(i)) << ": " <<  count << " ";
     }
     mOutput << "\n";
 
-    auto White = [](aiColor3D c) { return c.r == 1 && c.g == 1 && c.b == 1; };
-    auto Black = [](aiColor3D c) { return c.r == 0 && c.g == 0 && c.b == 0; };
+    auto White = [](const aiColor3D &c) { return c.r == 1 && c.g == 1 && c.b == 1; };
+    auto Black = [](const aiColor3D &c) { return c.r == 0 && c.g == 0 && c.b == 0; };
 
     aiColor3D diffuse, specular, transparency;
     bool constantDiffuse = (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse) == AI_SUCCESS &&
@@ -616,7 +612,7 @@ void PbrtExporter::WriteMaterial(int m) {
                         eta != 1);
 
     mOutput << "#    - Constants: diffuse " << constantDiffuse << " specular " << constantSpecular <<
-        " transprency " << constantTransparency << " opacity " << constantOpacity <<
+        " transparency " << constantTransparency << " opacity " << constantOpacity <<
         " shininess " << constantShininess << " shininess strength " << constantShininessStrength <<
         " eta " << constantEta << "\n";
 
@@ -761,7 +757,7 @@ void PbrtExporter::WriteLights() {
             case aiLightSource_AREA: {
                 aiVector3D left = light->mDirection ^ light->mUp;
                 // rectangle. center at position, direction is normal vector
-                float dLeft = light->mSize.x / 2, dUp = light->mSize.y / 2;
+                ai_real dLeft = light->mSize.x / 2, dUp = light->mSize.y / 2;
                 aiVector3D vertices[4] = {
                      light->mPosition - dLeft * left - dUp * light->mUp,
                      light->mPosition + dLeft * left - dUp * light->mUp,

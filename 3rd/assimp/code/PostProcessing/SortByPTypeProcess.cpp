@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2022, assimp team
 
 
 
@@ -61,9 +61,7 @@ SortByPTypeProcess::SortByPTypeProcess() :
 
 // ------------------------------------------------------------------------------------------------
 // Destructor, private as well
-SortByPTypeProcess::~SortByPTypeProcess() {
-    // nothing to do here
-}
+SortByPTypeProcess::~SortByPTypeProcess() = default;
 
 // ------------------------------------------------------------------------------------------------
 // Returns whether the processing step is present in the given flag field.
@@ -127,7 +125,7 @@ void SortByPTypeProcess::Execute(aiScene *pScene) {
     unsigned int aiNumMeshesPerPType[4] = { 0, 0, 0, 0 };
 
     std::vector<aiMesh *> outMeshes;
-    outMeshes.reserve(pScene->mNumMeshes << 1u);
+    outMeshes.reserve(static_cast<size_t>(pScene->mNumMeshes) << 1u);
 
     bool bAnyChanges = false;
 
@@ -135,7 +133,9 @@ void SortByPTypeProcess::Execute(aiScene *pScene) {
     std::vector<unsigned int>::iterator meshIdx = replaceMeshIndex.begin();
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         aiMesh *const mesh = pScene->mMeshes[i];
-        ai_assert(0 != mesh->mPrimitiveTypes);
+        if (mesh->mPrimitiveTypes == 0) {
+            throw DeadlyImportError("Mesh with invalid primitive type: ", mesh->mName.C_Str());
+        }
 
         // if there's just one primitive type in the mesh there's nothing to do for us
         unsigned int num = 0;
@@ -309,7 +309,7 @@ void SortByPTypeProcess::Execute(aiScene *pScene) {
                         VertexWeightTable &tbl = avw[idx];
                         for (VertexWeightTable::const_iterator it = tbl.begin(), end = tbl.end();
                                 it != end; ++it) {
-                            tempBones[(*it).first].push_back(aiVertexWeight(outIdx, (*it).second));
+                            tempBones[(*it).first].emplace_back(outIdx, (*it).second);
                         }
                     }
 

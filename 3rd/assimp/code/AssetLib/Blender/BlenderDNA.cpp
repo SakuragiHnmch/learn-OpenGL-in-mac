@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
+Copyright (c) 2006-2022, assimp team
 
 
 All rights reserved.
@@ -198,9 +198,9 @@ void DNAParser::Parse() {
         s.size = offset;
     }
 
-    ASSIMP_LOG_DEBUG_F("BlenderDNA: Got ", dna.structures.size(), " structures with totally ", fields, " fields");
+    ASSIMP_LOG_DEBUG("BlenderDNA: Got ", dna.structures.size(), " structures with totally ", fields, " fields");
 
-#ifdef ASSIMP_BUILD_BLENDER_DEBUG
+#if ASSIMP_BUILD_BLENDER_DEBUG_DNA
     dna.DumpToFile();
 #endif
 
@@ -208,7 +208,7 @@ void DNAParser::Parse() {
     dna.RegisterConverters();
 }
 
-#ifdef ASSIMP_BUILD_BLENDER_DEBUG
+#if ASSIMP_BUILD_BLENDER_DEBUG_DNA
 
 #include <fstream>
 // ------------------------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ void DNA ::DumpToFile() {
 
     ASSIMP_LOG_INFO("BlenderDNA: Dumped dna to dna.txt");
 }
-#endif
+#endif // ASSIMP_BUILD_BLENDER_DEBUG_DNA
 
 // ------------------------------------------------------------------------------------------------
 /*static*/ void DNA ::ExtractArraySize(
@@ -325,10 +325,10 @@ void SectionParser ::Next() {
     stream.SetCurrentPos(current.start + current.size);
 
     const char tmp[] = {
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1(),
-        (const char)stream.GetI1()
+        (char)stream.GetI1(),
+        (char)stream.GetI1(),
+        (char)stream.GetI1(),
+        (char)stream.GetI1()
     };
     current.id = std::string(tmp, tmp[3] ? 4 : tmp[2] ? 3 : tmp[1] ? 2 : 1);
 

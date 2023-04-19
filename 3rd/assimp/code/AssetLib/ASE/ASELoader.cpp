@@ -3,9 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2020, assimp team
-
-
+Copyright (c) 2006-2022, assimp team
 
 All rights reserved.
 
@@ -91,25 +89,13 @@ ASEImporter::ASEImporter() :
 
 // ------------------------------------------------------------------------------------------------
 // Destructor, private as well
-ASEImporter::~ASEImporter() {
-    // empty
-}
+ASEImporter::~ASEImporter() = default;
 
 // ------------------------------------------------------------------------------------------------
 // Returns whether the class can handle the format of the given file.
-bool ASEImporter::CanRead(const std::string &pFile, IOSystem *pIOHandler, bool cs) const {
-    // check file extension
-    const std::string extension = GetExtension(pFile);
-
-    if (extension == "ase" || extension == "ask") {
-        return true;
-    }
-
-    if ((!extension.length() || cs) && pIOHandler) {
-        const char *tokens[] = { "*3dsmax_asciiexport" };
-        return SearchFileHeaderForToken(pIOHandler, pFile, tokens, 1);
-    }
-    return false;
+bool ASEImporter::CanRead(const std::string &pFile, IOSystem *pIOHandler, bool /*checkSig*/) const {
+    static const char *tokens[] = { "*3dsmax_asciiexport" };
+    return SearchFileHeaderForToken(pIOHandler, pFile, tokens, AI_COUNT_OF(tokens));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -277,7 +263,7 @@ void ASEImporter::GenerateDefaultMaterial() {
     }
     if (bHas || mParser->m_vMaterials.empty()) {
         // add a simple material without submaterials to the parser's list
-        mParser->m_vMaterials.push_back(ASE::Material(AI_DEFAULT_MATERIAL_NAME));
+        mParser->m_vMaterials.emplace_back(AI_DEFAULT_MATERIAL_NAME);
         ASE::Material &mat = mParser->m_vMaterials.back();
 
         mat.mDiffuse = aiColor3D(0.6f, 0.6f, 0.6f);
@@ -614,7 +600,7 @@ void ASEImporter::AddNodes(const std::vector<BaseNode *> &nodes,
             node->mNumChildren++;
 
             // What we did is so great, it is at least worth a debug message
-            ASSIMP_LOG_VERBOSE_DEBUG("ASE: Generating separate target node (" + snode->mName + ")");
+            ASSIMP_LOG_VERBOSE_DEBUG("ASE: Generating separate target node (", snode->mName, ")");
         }
     }
 
@@ -683,7 +669,7 @@ void ASEImporter::BuildNodes(std::vector<BaseNode *> &nodes) {
         }
     }
 
-    // Are there ane orphaned nodes?
+    // Are there any orphaned nodes?
     if (!aiList.empty()) {
         std::vector<aiNode *> apcNodes;
         apcNodes.reserve(aiList.size() + pcScene->mRootNode->mNumChildren);
@@ -882,6 +868,7 @@ void ASEImporter::ConvertMaterial(ASE::Material &mat) {
         unsigned int iWire = 1;
         mat.pcInstance->AddProperty<int>((int *)&iWire, 1, AI_MATKEY_ENABLE_WIREFRAME);
     }
+    // fallthrough
     case D3DS::Discreet3DS::Gouraud:
         eShading = aiShadingMode_Gouraud;
         break;
@@ -1016,8 +1003,8 @@ void ASEImporter::ConvertMeshes(ASE::Mesh &mesh, std::vector<aiMesh *> &avOutMes
                                             blubb != mesh.mBoneVertices[iIndex2].mBoneWeights.end(); ++blubb) {
 
                                         // NOTE: illegal cases have already been filtered out
-                                        avOutputBones[(*blubb).first].push_back(std::pair<unsigned int, float>(
-                                                iBase, (*blubb).second));
+                                        avOutputBones[(*blubb).first].emplace_back(
+                                                iBase, (*blubb).second);
                                     }
                                 }
                             }
