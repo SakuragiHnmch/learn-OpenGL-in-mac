@@ -81,8 +81,8 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("../resource/model/backpack/backpack.obj");
-
+//    Model ourModel("../resource/model/backpack/backpack.obj");
+    Model ourModel("../resource/model/voyager.gltf");
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
