@@ -160,12 +160,12 @@ private:
         // specular: texture_specularN
         // normal: texture_normalN
 
-        std::vector<aiTexture*> aiTextures;
-        for (int i = 0; i < scene->mNumTextures; i++) {
-            aiTextures.emplace_back(scene->mTextures[i]);
-        }
+//        std::vector<aiTexture*> aiTextures;
+//        for (int i = 0; i < scene->mNumTextures; i++) {
+//            aiTextures.emplace_back(scene->mTextures[i]);
+//        }
 
-        auto texels = std::vector<aiTexel>(scene->mTextures[0]->pcData, scene->mTextures[0]->pcData + scene->mTextures[0]->mWidth);
+//        auto texels = std::vector<aiTexel>(scene->mTextures[0]->pcData, scene->mTextures[0]->pcData + scene->mTextures[0]->mWidth);
         bool fromEmbedded = scene->mNumTextures != 0;
 
         // 1. diffuse maps
@@ -209,7 +209,7 @@ private:
             {   // if texture hasn't been loaded already, load it
                 Texture texture;
                 auto texData = fromEmbedded ?
-                        TextureFromBuffer(reinterpret_cast<unsigned char *>(scene->mTextures[i]->pcData), scene->mTextures[i]->mWidth)
+                        TextureFromBuffer(reinterpret_cast<unsigned char *>(scene->GetEmbeddedTexture(str.C_Str())->pcData), scene->GetEmbeddedTexture(str.C_Str())->mWidth)
                         : TextureFromFile(str.C_Str(), this->directory);
 
                 texture.id = UploadTexture(texData);
