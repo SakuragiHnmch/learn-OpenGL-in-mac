@@ -11,3 +11,5 @@ add_subdirectory(3-model-loading)
 add_subdirectory(4-advanced-openGL)
 
 add_subdirectory(5-tessellation)
+
+add_subdirectory(6-skeleton)
