@@ -83,14 +83,6 @@ private:
             auto* channel = animation->mChannels[i];
             std::string boneName = channel->mNodeName.data;
 
-            // Is the following if expression really matters?
-            if (boneInfoMap.find(boneName) == boneInfoMap.end()) {
-                boneInfoMap[boneName].id = boneCount;
-                boneCount++;
-            }
-            // the data used to initialize a bone comes from the channel
-            // means the extra boneInfo does not have a offset matrix
-
             m_Bones.emplace_back(Bone(boneName, boneInfoMap[boneName].id, channel));
         }
 

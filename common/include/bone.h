@@ -58,7 +58,13 @@ public:
         m_NumRotations = channel->mNumRotationKeys;
         for (int rotationIndex = 0; rotationIndex < m_NumRotations; rotationIndex++) {
             KeyRotation data;
-            data.orientation = glm::make_quat(&channel->mRotationKeys[rotationIndex].mValue.w);
+
+            auto quat = channel->mRotationKeys[rotationIndex].mValue;
+            data.orientation.x = quat.x;
+            data.orientation.y = quat.y;
+            data.orientation.z = quat.z;
+            data.orientation.w = quat.w;
+
             data.timeStamp = channel->mRotationKeys[rotationIndex].mTime;
 
             m_Rotations.emplace_back(data);

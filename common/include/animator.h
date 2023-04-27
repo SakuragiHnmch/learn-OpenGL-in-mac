@@ -25,7 +25,7 @@ public:
     {
         m_FinalBoneMatrices.reserve(100);
         for (int i = 0; i < 100; i++) {
-            m_FinalBoneMatrices.emplace_back(glm::mat4(1.0f));
+            m_FinalBoneMatrices.emplace_back(1.0f);
         }
     }
 
@@ -33,12 +33,12 @@ public:
         m_DeltaTime = dt;
         if (m_CurrentAnimation) {
             m_CurrentTime += m_CurrentAnimation->GetTicksPerSecond() * dt;
-            std::cout << "*************************************\n";
-            std::cout << "**** delta time: " << m_DeltaTime << "\n"
-                << "**** current time: " << m_CurrentTime << "\n";
+//            std::cout << "*************************************\n";
+//            std::cout << "**** delta time: " << m_DeltaTime << "\n"
+//                << "**** current time: " << m_CurrentTime << "\n";
 
             m_CurrentTime = fmod(m_CurrentTime, m_CurrentAnimation->GetDuration());
-            std::cout << "**** post mode current time: " << m_CurrentTime << "\n";
+//            std::cout << "**** post mode current time: " << m_CurrentTime << "\n";
 
             CalculateBoneTransform(&m_CurrentAnimation->GetRootNode(), glm::mat4(1.0f));
         }
